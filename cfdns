@@ -1,0 +1,67 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+use WWW::Curl::Easy;
+use Config::Simple;
+
+        my $cfg = new Config::Simple();
+        $cfg->read("/etc/cfdns/cfdns.cfg");
+
+        my $email = $cfg->param("email");
+        my $domain = $cfg->param("domain");
+	my $tkn = $cfg->param("apikey");
+	my $rec_id = $cfg->param("subdomainid");
+	my $rec_name = $cfg->param("subdomain");
+	my $service_mode = $cfg->param("servicemode");
+
+        my $curl = WWW::Curl::Easy->new;
+
+        $curl->setopt(CURLOPT_HEADER,0);
+        $curl->setopt(CURLOPT_URL, 'http://icanhazip.com');
+
+        # A filehandle, reference to a scalar or reference to a typeglob can be used here.
+        my $response_body;
+        $curl->setopt(CURLOPT_WRITEDATA,\$response_body);
+
+        # Starts the actual request
+        my $retcode = $curl->perform;
+
+        # Looking at the results...
+        if ($retcode == 0) {
+                print("Curl to grab external IP worked.\n");
+                my $response_code = $curl->getinfo(CURLINFO_HTTP_CODE);
+                # judge result and next action based on $response_code
+	} else {
+                # Error code, type of error, error message
+                print("An error occured while getting IP: $retcode ".$curl->strerror($retcode)." ".$curl->errbuf."\n");
+        }
+
+##########
+
+	my $curl2 = WWW::Curl::Easy->new;
+
+	$curl2->setopt(CURLOPT_HEADER,0);
+	$curl2->setopt(CURLOPT_URL, 'https://www.cloudflare.com/api_json.html?a=rec_edit&tkn=' . $tkn . '&id=' . $rec_id . '&email=' . $email . '&z=' . $domain . '&type=A&name=' . $rec_name . '&service_mode=' . $service_mode . '&ttl=1&content=' . $response_body . '');
+
+	my $response_body2;
+	$curl2->setopt(CURLOPT_WRITEDATA,\$response_body2);
+
+	my $retcode2 = $curl2->perform;
+
+	if ($retcode2 == 0) {
+		print("Curl to update record worked.\n");
+
+		my $response_code2 = $curl2->getinfo(CURLINFO_HTTP_CODE);
+
+		if ($response_body2 =~ m/success/g) {
+			print ("IP Updated Successfully.\n");
+		} else {
+			print ("Something went wrong: $response_body2");
+		}
+
+	} else {
+
+		print("An error occured while updating the record: $retcode2 ".$curl2->strerror($retcode2)." ".$curl2->errbuff."\n");
+	}
+	
