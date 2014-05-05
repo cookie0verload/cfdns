@@ -8,60 +8,61 @@ use Config::Simple;
         my $cfg = new Config::Simple();
         $cfg->read("/etc/cfdns/cfdns.cfg");
 
-        my $email = $cfg->param("email");
-        my $domain = $cfg->param("domain");
-	my $tkn = $cfg->param("apikey");
-	my $rec_id = $cfg->param("subdomainid");
-	my $rec_name = $cfg->param("subdomain");
-	my $service_mode = $cfg->param("servicemode");
+	my $whatsmyip = $cfg->param("misc.whatsmyip");
+        my $email = $cfg->param("auth.email");
+        my $domain = $cfg->param("auth.domain");
+	my $tkn = $cfg->param("auth.apikey");
+	my $rec_id = $cfg->param("record.subdomainid");
+	my $rec_name = $cfg->param("record.subdomain");
+	my $service_mode = $cfg->param("record.servicemode");
 
-        my $curl = WWW::Curl::Easy->new;
+#Grab External IP
 
-        $curl->setopt(CURLOPT_HEADER,0);
-        $curl->setopt(CURLOPT_URL, 'http://icanhazip.com');
+        my $getip = WWW::Curl::Easy->new;
 
-        # A filehandle, reference to a scalar or reference to a typeglob can be used here.
-        my $response_body;
-        $curl->setopt(CURLOPT_WRITEDATA,\$response_body);
+        $getip->setopt(CURLOPT_HEADER,0);
+        $getip->setopt(CURLOPT_URL, $whatsmyip);
+
+        my $getip_body;
+        $getip->setopt(CURLOPT_WRITEDATA,\$getip_body);
 
         # Starts the actual request
-        my $retcode = $curl->perform;
+        my $getip_code = $getip->perform;
 
         # Looking at the results...
-        if ($retcode == 0) {
+        if ($getip_code == 0) {
                 print("Curl to grab external IP worked.\n");
-                my $response_code = $curl->getinfo(CURLINFO_HTTP_CODE);
-                # judge result and next action based on $response_code
+                my $getip_httpcode = $getip->getinfo(CURLINFO_HTTP_CODE);
 	} else {
                 # Error code, type of error, error message
-                print("An error occured while getting IP: $retcode ".$curl->strerror($retcode)." ".$curl->errbuf."\n");
+                print("An error occured while getting IP: $getip_code ".$getip->strerror($getip_code)." ".$getip->errbuf."\n");
         }
 
-##########
 
-	my $curl2 = WWW::Curl::Easy->new;
+#Update Record
 
-	$curl2->setopt(CURLOPT_HEADER,0);
-	$curl2->setopt(CURLOPT_URL, 'https://www.cloudflare.com/api_json.html?a=rec_edit&tkn=' . $tkn . '&id=' . $rec_id . '&email=' . $email . '&z=' . $domain . '&type=A&name=' . $rec_name . '&service_mode=' . $service_mode . '&ttl=1&content=' . $response_body . '');
+	my $updateip = WWW::Curl::Easy->new;
 
-	my $response_body2;
-	$curl2->setopt(CURLOPT_WRITEDATA,\$response_body2);
+	$updateip->setopt(CURLOPT_HEADER,0);
+	$updateip->setopt(CURLOPT_URL, 'https://www.cloudflare.com/api_json.html?a=rec_edit&tkn=' . $tkn . '&id=' . $rec_id . '&email=' . $email . '&z=' . $domain . '&type=A&name=' . $rec_name . '&service_mode=' . $service_mode . '&ttl=1&content=' . $getip_body . '');
 
-	my $retcode2 = $curl2->perform;
+	my $updateip_body;
+	$updateip->setopt(CURLOPT_WRITEDATA,\$updateip_body);
 
-	if ($retcode2 == 0) {
+	my $updateip_code = $updateip->perform;
+
+	if ($updateip_code == 0) {
 		print("Curl to update record worked.\n");
-
-		my $response_code2 = $curl2->getinfo(CURLINFO_HTTP_CODE);
-
-		if ($response_body2 =~ m/success/g) {
+		my $updateip_httpcode = $updateip->getinfo(CURLINFO_HTTP_CODE);
+		
+		if ($updateip_body =~ m/success/g) {
 			print ("IP Updated Successfully.\n");
 		} else {
-			print ("Something went wrong: $response_body2");
+			print ("Something went wrong: $updateip_body");
 		}
 
 	} else {
 
-		print("An error occured while updating the record: $retcode2 ".$curl2->strerror($retcode2)." ".$curl2->errbuff."\n");
+		print("An error occured while updating the record: $updateip_code ".$updateip->strerror($updateip_code)." ".$updateip->errbuff."\n");
 	}
 	
