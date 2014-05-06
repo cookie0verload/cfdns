@@ -6,6 +6,7 @@ Cloudflare Tools - matt@mattrobey.co.uk
 Basic grab ip and update specfic cloudflare record for use as a dynamic ip updater.
 
 -v : verbose
+
 -vv : very verbose
 
 Installation
