@@ -4,9 +4,16 @@ use strict;
 use warnings;
 use WWW::Curl::Easy;
 use Config::Simple;
+use Getopt::Long;
 
         my $cfg = new Config::Simple();
-        $cfg->read("/etc/cfdns/cfdns.cfg");
+        $cfg->read("cfdns.cfg");
+
+
+	my $verbose = '';	# option variable with default value (false)
+	my $vv = '';
+
+	GetOptions ('verbose' => \$verbose, 'v' => \$verbose, 'vv' => \$vv);
 
 	my $whatsmyip = $cfg->param("misc.whatsmyip");
         my $email = $cfg->param("auth.email");
@@ -28,11 +35,20 @@ use Config::Simple;
 
         # Starts the actual request
         my $getip_code = $getip->perform;
+	
+	if ($vv) {
+                        print("DEBUG: Grabbing IP from $whatsmyip\n");
+       	}
+
 
         # Looking at the results...
         if ($getip_code == 0) {
                 print("Curl to grab external IP worked.\n");
                 my $getip_httpcode = $getip->getinfo(CURLINFO_HTTP_CODE);
+		if ($verbose or $vv) {
+			print("DEBUG: $getip_httpcode - ");
+			print ("$getip_body\n");
+		}
 	} else {
                 # Error code, type of error, error message
                 print("An error occured while getting IP: $getip_code ".$getip->strerror($getip_code)." ".$getip->errbuf."\n");
@@ -43,22 +59,33 @@ use Config::Simple;
 
 	my $updateip = WWW::Curl::Easy->new;
 
+	my $updateip_url = 'https://www.cloudflare.com/api_json.html?a=rec_edit&tkn=' . $tkn . '&id=' . $rec_id . '&email=' . $email . '&z=' . $domain . '&type=A&name=' . $rec_name . '&service_mode=' . $service_mode . '&ttl=1&content=' . $getip_body . '';
+
 	$updateip->setopt(CURLOPT_HEADER,0);
-	$updateip->setopt(CURLOPT_URL, 'https://www.cloudflare.com/api_json.html?a=rec_edit&tkn=' . $tkn . '&id=' . $rec_id . '&email=' . $email . '&z=' . $domain . '&type=A&name=' . $rec_name . '&service_mode=' . $service_mode . '&ttl=1&content=' . $getip_body . '');
+	$updateip->setopt(CURLOPT_URL, $updateip_url);
 
 	my $updateip_body;
 	$updateip->setopt(CURLOPT_WRITEDATA,\$updateip_body);
 
 	my $updateip_code = $updateip->perform;
+	
+	if ($vv) {
+                        print("DEBUG: updating cloudflare record - $updateip_url\n");
+        }
 
 	if ($updateip_code == 0) {
 		print("Curl to update record worked.\n");
 		my $updateip_httpcode = $updateip->getinfo(CURLINFO_HTTP_CODE);
 		
+		if ($verbose or $vv) {
+                        print("DEBUG: $updateip_httpcode - ");
+                        print ("$updateip_body\n");
+                }
+
 		if ($updateip_body =~ m/success/g) {
 			print ("IP Updated Successfully.\n");
 		} else {
-			print ("Something went wrong: $updateip_body");
+			print ("Something went wrong: $updateip_body\n");
 		}
 
 	} else {
