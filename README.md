@@ -1,7 +1,7 @@
 cfdns
 ==========
 
-Cloudflare Tools - matt@mattrobey.co.uk
+Cloudflare Tools - @cookiemonstero (Twitter)
 
 Basic grab ip and update specfic cloudflare record for use as a dynamic ip updater.
 
@@ -19,4 +19,4 @@ Create /etc/cfdns/
 Place cfdns.cfg in /etc/cfdns/
 
 
-I'll make a pretty way of doing this for fresh installs eventually.
+I'll make a pretty way of doing this for fresh installs eventually, might even package it up ;)
