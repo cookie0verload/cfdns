@@ -33,19 +33,21 @@ use Getopt::Long;
         my $getip_body;
         $getip->setopt(CURLOPT_WRITEDATA,\$getip_body);
 
+
         # Starts the actual request
         my $getip_code = $getip->perform;
+	chomp($getip_body);
+
 	
 	if ($vv) {
                         print("DEBUG: Grabbing IP from $whatsmyip\n");
        	}
 
-
         # Looking at the results...
         if ($getip_code == 0) {
                 print("Curl to grab external IP worked.\n");
-                my $getip_httpcode = $getip->getinfo(CURLINFO_HTTP_CODE);
 		if ($verbose or $vv) {
+                        my $getip_httpcode = $getip->getinfo(CURLINFO_HTTP_CODE);
 			print("DEBUG: $getip_httpcode - ");
 			print ("$getip_body\n");
 		}
@@ -54,12 +56,11 @@ use Getopt::Long;
                 print("An error occured while getting IP: $getip_code ".$getip->strerror($getip_code)." ".$getip->errbuf."\n");
         }
 
-
 #Update Record
 
 	my $updateip = WWW::Curl::Easy->new;
 
-	my $updateip_url = 'https://www.cloudflare.com/api_json.html?a=rec_edit&tkn=' . $tkn . '&id=' . $rec_id . '&email=' . $email . '&z=' . $domain . '&type=A&name=' . $rec_name . '&service_mode=' . $service_mode . '&ttl=1&content=' . $getip_body . '';
+	my $updateip_url = "https://www.cloudflare.com/api_json.html?a=rec_edit&tkn=$tkn&id=$rec_id&email=$email&z=$domain&type=A&name=$rec_name&service_mode=$service_mode&ttl=1&content=$getip_body";
 
 	$updateip->setopt(CURLOPT_HEADER,0);
 	$updateip->setopt(CURLOPT_URL, $updateip_url);
@@ -75,9 +76,9 @@ use Getopt::Long;
 
 	if ($updateip_code == 0) {
 		print("Curl to update record worked.\n");
-		my $updateip_httpcode = $updateip->getinfo(CURLINFO_HTTP_CODE);
 		
 		if ($verbose or $vv) {
+                        my $updateip_httpcode = $updateip->getinfo(CURLINFO_HTTP_CODE);
                         print("DEBUG: $updateip_httpcode - ");
                         print ("$updateip_body\n");
                 }
@@ -90,6 +91,5 @@ use Getopt::Long;
 
 	} else {
 
-		print("An error occured while updating the record: $updateip_code ".$updateip->strerror($updateip_code)." ".$updateip->errbuff."\n");
+		print ("An error occured while updating the record: $updateip_code $updateip->strerror($updateip_code) $updateip->errbuff \n");
 	}
-	
