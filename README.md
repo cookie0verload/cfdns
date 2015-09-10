@@ -1,7 +1,7 @@
 cfdns
 ==========
 
-Cloudflare Tools - @cookiemonstero (Twitter)
+Cloudflare Tools
 
 Basic grab ip and update specfic cloudflare record for use as a dynamic ip updater.
 
