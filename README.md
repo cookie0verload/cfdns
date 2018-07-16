@@ -8,10 +8,9 @@ Basic grab ip and update specfic cloudflare record for use as a dynamic ip updat
 node cfdns.js
 ```
 
-Valid args:
+## Requirements
 
-- -v : verbose
-- -vv : very verbose
+- NodeJS v8.x
 
 ## Installation (Raspian)
 
@@ -30,7 +29,8 @@ sudo apt-get install -y nodejs
 Clone repo
 
 ```
-git clone https://github.com/secopsbot/cfdns
+git clone
+https://github.com/secopsbot/cfdns
 ```
 
 Install required modules
@@ -39,4 +39,10 @@ Install required modules
 cd /path/to/cfdns
 
 npm install
+```
+
+## CronJob Example
+
+```
+*/5 * * * * /usr/bin/node /home/secopsbot/cfdns/cfdns.js
 ```
