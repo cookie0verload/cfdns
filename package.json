@@ -1,0 +1,25 @@
+{
+  "name": "cfdns",
+  "version": "0.2.0",
+  "description": "Simple dynamic DNS cloudflare A record updater.",
+  "main": "cfdns.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/secopsbot/cfdns.git"
+  },
+  "author": "Matt Robey",
+  "license": "GPL-3.0",
+  "bugs": {
+    "url": "https://github.com/secopsbot/cfdns/issues"
+  },
+  "homepage": "https://github.com/secopsbot/cfdns#readme",
+  "dependencies": {
+    "icanhazip": "1.0.3",
+    "request": "2.87.0",
+    "dotenv": "6.0.0",
+    "fs":     "0.0.1-security"
+  }
+}

@@ -1,22 +1,42 @@
-cfdns
-==========
-
-Cloudflare Tools
+# cfdns
 
 Basic grab ip and update specfic cloudflare record for use as a dynamic ip updater.
 
--v : verbose
+## Usage
 
--vv : very verbose
+```
+node cfdns.js
+```
 
-Installation
-============
+Valid args:
 
-Place cfdns in /usr/bin/
+- -v : verbose
+- -vv : very verbose
 
-Create /etc/cfdns/
+## Installation (Raspian)
 
-Place cfdns.cfg in /etc/cfdns/
+Install Node Repo
 
+```
+curl -sL https://deb.nodesource.com/setup_8.x | sudo -E bash -
+```
 
-I'll make a pretty way of doing this for fresh installs eventually, might even package it up ;)
+Install NodeJS
+
+```
+sudo apt-get install -y nodejs
+```
+
+Clone repo
+
+```
+git clone https://github.com/secopsbot/cfdns
+```
+
+Install required modules
+
+```
+cd /path/to/cfdns
+
+npm install
+```
