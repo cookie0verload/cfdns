@@ -11,7 +11,7 @@
     "url": "git+https://github.com/secopsbot/cfdns.git"
   },
   "author": "Matt Robey",
-  "license": "GPL-3.0",
+  "license": "GPL-2.0",
   "bugs": {
     "url": "https://github.com/secopsbot/cfdns/issues"
   },
