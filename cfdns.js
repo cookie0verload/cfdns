@@ -16,6 +16,7 @@ c_email = process.env.email;
 c_domain_name = process.env.domain;
 c_subdomain_name = process.env.subdomain + '.' + process.env.domain;
 c_cloudflare_apiurl = 'https://api.cloudflare.com/client/v4/zones';
+timeout = 3000;
 
 // Set the headers
 var headers = {
@@ -33,6 +34,7 @@ var request = require('request');
 
 // Configure the request
 var options = {
+    timeout: timeout,
     url: c_cloudflare_apiurl,
     method: 'GET',
     headers: headers,
@@ -60,6 +62,7 @@ var request = require('request');
 
 // Configure the request
 var options = {
+    timeout: timeout,
     url: c_cloudflare_apiurl + '/' + zone_id + '/dns_records',
     method: 'GET',
     headers: headers,
@@ -103,6 +106,7 @@ var update_body = JSON.stringify(
 
 // Configure the request
 var options = {
+    timeout: timeout,
     url: c_cloudflare_apiurl + '/' + zone_id + '/dns_records/' + subdomain_id,
     method: 'PUT',
     headers: headers,
